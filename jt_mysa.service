@@ -1,0 +1,17 @@
+[Unit]
+Description=Polls data from mysa and pushes to mqtt
+#After=multi-user.target
+After=syslog.target network.target mosquitto.service
+
+[Service]
+EnvironmentFile=/etc/mysa_rs.conf
+Type=simple
+ExecStart=/usr/local/bin/mysa_rs
+ExecStop=/bin/kill -9 $MAINPID
+Restart=on-failure
+User=jeffthomas
+#StandardOutput=syslog
+#StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target

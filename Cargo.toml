@@ -2,6 +2,8 @@
 name = "mysa_rs"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "Simple service to poll mysa for temperature and humidity and push to mqtt"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -17,3 +19,10 @@ reqwest = { version = "0.11.12", features = ["json"] }
 serde_json = "1.0.86"
 tokio = { version = "1.21.2", features = ["full", "macros"] }
 tokio-stream = "0.1.10"
+
+[package.metadata.generate-rpm]
+assets = [
+    { source = "target/release/mysa_rs", dest = "/usr/local/bin/mysa_rs", mode = "755" },
+    { source = "jt_mysa.service", dest = "/etc/systemd/system/jt_mysa.service", mode = "644" },
+    { source = "mysa_rs.conf.template", dest = "/etc/mysa_rs.conf", mode = "600", config = true },
+]
