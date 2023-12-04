@@ -5,11 +5,11 @@ use anyhow::anyhow;
 use anyhow::Context;
 use anyhow::Result;
 use aws_config::meta::region::RegionProviderChain;
-use aws_config::RetryConfig;
-use aws_sdk_cognitoidentityprovider::model::{
+use aws_config::retry::RetryConfig;
+use aws_sdk_cognitoidentityprovider::types::{
     AuthFlowType, AuthenticationResultType, ChallengeNameType,
 };
-use aws_sdk_cognitoidentityprovider::Region;
+use aws_sdk_cognitoidentityprovider::config::Region;
 use cognito_srp::SrpClient;
 use futures::StreamExt;
 
