@@ -1,19 +1,19 @@
 // From: https://github.com/hypnoseal/cognitoidentityprovider-examples
 #[path = "mqtt_memory_persist.rs"]
 mod mqtt_memory_persist;
+use std::time::Duration;
+
 use anyhow::anyhow;
 use anyhow::Context;
 use anyhow::Result;
 use aws_config::meta::region::RegionProviderChain;
 use aws_config::retry::RetryConfig;
-use aws_sdk_cognitoidentityprovider::types::{
-    AuthFlowType, AuthenticationResultType, ChallengeNameType,
-};
 use aws_sdk_cognitoidentityprovider::config::Region;
+use aws_sdk_cognitoidentityprovider::types::AuthFlowType;
+use aws_sdk_cognitoidentityprovider::types::AuthenticationResultType;
+use aws_sdk_cognitoidentityprovider::types::ChallengeNameType;
 use cognito_srp::SrpClient;
 use futures::StreamExt;
-
-use std::time::Duration;
 use tokio_stream::wrappers::IntervalStream;
 
 struct MysaAuth {
@@ -242,6 +242,7 @@ struct MysaReading {
     temp_c: String,
     humidity_pct: String,
     timestamp: String,
+    set_point_c: String,
 }
 
 async fn get_mysa_reading(id_token: &str, mysa_device_id: &str) -> Result<MysaReading> {
@@ -263,6 +264,7 @@ async fn get_mysa_reading(id_token: &str, mysa_device_id: &str) -> Result<MysaRe
         temp_c: reading["MainTemp"].to_string(),
         humidity_pct: reading["Humidity"].to_string(),
         timestamp: reading["Timestamp"].to_string(),
+        set_point_c: reading["SetPoint"].to_string(),
     })
 }
 
@@ -274,6 +276,11 @@ fn send_to_mqtt(
     const QOS: i32 = 1;
 
     let msgs = &[
+        paho_mqtt::Message::new(
+            format!("{}/{}", mqtt_config.topic_prefix, "set_point/c"),
+            reading.set_point_c,
+            QOS,
+        ),
         paho_mqtt::Message::new(
             format!("{}/{}", mqtt_config.topic_prefix, "temperature/c"),
             reading.temp_c,
@@ -292,7 +299,6 @@ fn send_to_mqtt(
                 .publish(msg.clone())
                 .map_err(anyhow::Error::from)
         })
-        .into_iter()
         .collect();
     toks.context("mqtt publish")?;
     Ok(())

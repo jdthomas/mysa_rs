@@ -2,8 +2,9 @@
 // https://github.com/eclipse/paho.mqtt.rust/blob/master/examples/async_persist_publish.rs
 /////////////////////////////////////////////////////////////////////////////
 
-use paho_mqtt as mqtt;
 use std::collections::HashMap;
+
+use paho_mqtt as mqtt;
 const PERSISTENCE_ERROR: mqtt::Error = mqtt::Error::Paho(mqtt::PERSISTENCE_ERROR);
 //use log::trace;
 
